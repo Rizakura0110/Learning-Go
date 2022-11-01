@@ -41,5 +41,4 @@ func main() {
 
 	apple := 10
 	fmt.Println(apple)
-
 }
