@@ -131,4 +131,92 @@ func main() {
 		copy(d[:], x)
 		fmt.Println(d)
 	}
+
+	{
+		var nilMap map[string]int
+		fmt.Println("nilmap == nil", nilMap == nil)
+		// nilMap["abc"] = 3
+	}
+
+	{
+		totalWins := map[string]int{}
+		fmt.Println("totalWins == nil:", totalWins == nil)
+		fmt.Println(totalWins["abc"])
+		totalWins["abc"] = 3
+		fmt.Println("totalWins[\"abc\"]:", totalWins["abc"])
+	}
+
+	{
+		totalWins := map[string]int{
+			"セネターズ":  14,
+			"スパローズ":  15,
+			"ファルコンズ": 22,
+		}
+		fmt.Println(totalWins)
+	}
+	{
+		teams := map[string][]string{
+			"ライターズ":    []string{"夏目", "森", "国木田"},
+			"ナイツ":      []string{"武田", "徳川", "明智"},
+			"ミュージシャンズ": []string{"ラベル", "ベートーベン", "リスト"},
+		}
+		fmt.Println(teams)
+		fmt.Println(teams["ライターズ"])
+
+		teams2 := map[string][]string{
+			"シャチチーム":  []string{"謙信", "信長", "家康"},
+			"ライオンチーム": []string{"レオ", "たか子", "カナ"},
+			"猫チーム":    []string{"AKB", "MNB", "FNB"},
+		}
+		fmt.Println(teams2)
+		fmt.Println(teams2["シャチチーム"])
+		fmt.Println(teams2["チャチチーム"])
+		fmt.Println(len(teams2["猫チーム"]))
+	}
+
+	{
+		totalWins := map[string]int{}
+		totalWins["ライターズ"] = 1
+		totalWins["ナイツ"] = 2
+		fmt.Println(totalWins["ライターズ"])
+		fmt.Println(totalWins["ミュージシャンズ"])
+		totalWins["ミュージシャンズ"]++
+		fmt.Println(totalWins["ミュージシャンズ"])
+	}
+	// カンマokイディオム
+	{
+		m := map[string]int{
+			"hello": 5,
+			"world": 0,
+		}
+		v, ok := m["hello"]
+		fmt.Println(v, ok)
+		v, ok = m["world"]
+		fmt.Println(v, ok)
+		v, ok = m["goodbye"]
+		fmt.Println(v, ok)
+
+		k := map[string]int{
+			"hello": 5,
+			"world": 10,
+		}
+		delete(k, "hello")
+		fmt.Println(k)
+	}
+	{
+		intSet := map[int]bool{}
+		vals := []int{5, 10, 2, 5, 8, 7, 3, 9, 1, 2, 10}
+		for _, v := range vals {
+			intSet[v] = true
+		}
+		fmt.Println(len(vals), len(intSet))
+		fmt.Println(intSet[5])
+		fmt.Println(intSet[500])
+		if intSet[100] {
+			fmt.Println("100は含まれている")
+		}
+		if intSet[10] {
+			fmt.Println("10は含まれている")
+		}
+	}
 }
