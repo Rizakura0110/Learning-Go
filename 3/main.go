@@ -219,4 +219,34 @@ func main() {
 			fmt.Println("10は含まれている")
 		}
 	}
+	// 構造体
+	{
+		type person struct {
+			name string
+			age  int
+			pet  string
+		}
+
+		var fred person
+		fmt.Println(fred)
+
+		bob := person{}
+		fmt.Println(bob)
+		bob.name = "ボブ"
+		fmt.Println(bob)
+
+		julia := person{
+			name: "Julia", // name
+			age:  40,      // age
+			pet:  "cat",   // pet
+		}
+		fmt.Println(julia)
+
+		beth := person{
+			age:  30,
+			name: "ベス",
+		}
+		fmt.Println(beth)
+		fmt.Println(bob.name)
+	}
 }
