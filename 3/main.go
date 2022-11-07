@@ -249,4 +249,71 @@ func main() {
 		fmt.Println(beth)
 		fmt.Println(bob.name)
 	}
+
+	{
+		var person struct {
+			name string
+			age  int
+			pet  string
+		}
+
+		person.name = "bob"
+		person.age = 50
+		person.pet = "dog"
+		fmt.Println(person)
+
+		pet := struct {
+			name string
+			kind string
+		}{
+			name: "ポチ",
+			kind: "dog",
+		}
+		fmt.Println(pet)
+	}
+	{
+		type firstPerson struct {
+			name string
+			age  int
+		}
+		type secondPerson struct {
+			name string
+			age  int
+		}
+		type thirdPerson struct {
+			age  int
+			name string
+		}
+		x1 := firstPerson{
+			"太郎",
+			24,
+		}
+		fmt.Println(x1)
+
+		var x2 secondPerson
+		x2 = secondPerson(x1)
+		fmt.Println(x2)
+		x12 := firstPerson(x2)
+		fmt.Println(x1 == x12)
+
+		var x3 thirdPerson
+		fmt.Println(x3)
+	}
+
+	{
+		type firstPerson struct {
+			name string
+			age  int
+		}
+		f := firstPerson{
+			name: "bob",
+			age:  50,
+		}
+		var g struct {
+			name string
+			age  int
+		}
+		g = f
+		fmt.Println(f == g)
+	}
 }
