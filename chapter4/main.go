@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+	"unicode/utf8"
 )
 
 func main() { //liststart
@@ -123,6 +124,52 @@ func main() { //liststart
 		evenVals := []int{2, 4, 6, 8, 10}
 		for i := 1; i < len(evenVals)-1; i++ {
 			fmt.Println(i, evenVals[i])
+		}
+	}
+
+	{
+		words := []string{"山", "sun", "微笑み", "人類学者", "モグラの穴", "mountain", "タコの足とイカの足", "antholopologist", "タコの足は8本でイカの足は10本"}
+		for _, word := range words {
+			switch size := utf8.RuneCountInString(word); size {
+			case 1, 2, 3, 4:
+				fmt.Printf("「%s」の文字数は%dで、短い単語だ。\n", word, size)
+			case 5:
+				fmt.Printf("「%s」の文字数は%dで、これはちょうどよい長さだ。\n", word, size)
+			case 6, 7, 8, 9:
+			default:
+				fmt.Printf("「%s」の文字数は%dで、とても長い。", word, size)
+				if n := len(word); size < 5 {
+					fmt.Printf("%dバイトもある！\n", n)
+				} else {
+					fmt.Println()
+				}
+			}
+		}
+	}
+
+	{
+		words := []string{"hi", "salutations", "hello"}
+		for _, word := range words {
+			switch wordLen := len(word); {
+			case wordLen < 5:
+				fmt.Println(word, "は短い単語です")
+			case wordLen > 10:
+				fmt.Println(word, "は長すぎる単語です")
+			default:
+				fmt.Println(word, "はちょうどよい長さの単語です")
+			}
+		}
+	}
+
+	{
+		rand.Seed(time.Now().Unix())
+		switch n := rand.Intn(10); {
+		case n == 0:
+			fmt.Println("少し小さすぎます:", n)
+		case n > 5:
+			fmt.Println("大きすぎます:", n)
+		default:
+			fmt.Println("いい感じの数字です:", n)
 		}
 	}
 }
