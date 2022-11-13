@@ -45,6 +45,15 @@ func divAndRemainder2(numerator int, denominator int) (result int, remainder int
 	result, remainder = numerator/denominator, numerator%denominator
 	return result, remainder, err
 }
+func callDivAndRemainder(numerator int, denominator int) {
+	x, y, z := divAndRemainder2(numerator, denominator)
+	if z != nil {
+		fmt.Print(x, "÷", y, "：")
+		fmt.Println(z)
+		os.Exit(1)
+	}
+	fmt.Print(numerator, "÷", denominator, " = ", x, "余り", y, "\n")
+}
 func main() {
 	result := div(5, 2)
 	fmt.Println(result)
@@ -70,4 +79,6 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println(result)
+	callDivAndRemainder(5, 2)
+	callDivAndRemainder(10, 0)
 }
