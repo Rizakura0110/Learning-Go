@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"os"
+)
 
 func div(numerator int, denominator int) int {
 	if denominator == 0 {
@@ -28,6 +32,19 @@ func addTo(base int, vals ...int) []int {
 	}
 	return out
 }
+func divAndRemainder(numerator, denominator int) (int, int, error) {
+	if denominator == 0 {
+		return 0, 0, errors.New("0での除算はできません")
+	}
+	return numerator / denominator, numerator % denominator, nil
+}
+func divAndRemainder2(numerator int, denominator int) (result int, remainder int, err error) {
+	if denominator == 0 {
+		return numerator, denominator, errors.New("0で割ることはできません")
+	}
+	result, remainder = numerator/denominator, numerator%denominator
+	return result, remainder, err
+}
 func main() {
 	result := div(5, 2)
 	fmt.Println(result)
@@ -46,4 +63,11 @@ func main() {
 	a := []int{4, 3}
 	fmt.Println(addTo(3, a...))
 	fmt.Println(addTo(3, []int{1, 2, 3, 4, 5}...))
+
+	result, _, err := divAndRemainder(5, 2)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(result)
 }
