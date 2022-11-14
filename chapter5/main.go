@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 func div(numerator int, denominator int) int {
@@ -54,31 +55,83 @@ func callDivAndRemainder(numerator int, denominator int) {
 	}
 	fmt.Print(numerator, "÷", denominator, " = ", x, "余り", y, "\n")
 }
+func add(i int, j int) int { return i + j }
+
+func sub(i int, j int) int { return i - j }
+
+func mul(i int, j int) int { return i * j }
+
+func div2(i int, j int) int { return i / j }
+
+var opMap = map[string]func(int, int) int{
+	"+": add,
+	"-": sub,
+	"*": mul,
+	"/": div2,
+}
+
 func main() {
-	result := div(5, 2)
-	fmt.Println(result)
+	/*
+		result := div(5, 2)
+		fmt.Println(result)
 
-	MyFunc(MyFuncOpts{
-		LastName: "Patel",
-		Age:      50,
-	})
-	MyFunc(MyFuncOpts{
-		FirstName: "Joe",
-		LastName:  "Smith",
-	})
-	fmt.Println(addTo(3))
-	fmt.Println(addTo(3, 2))
-	fmt.Println(addTo(3, 2, 4, 6, 8))
-	a := []int{4, 3}
-	fmt.Println(addTo(3, a...))
-	fmt.Println(addTo(3, []int{1, 2, 3, 4, 5}...))
+		MyFunc(MyFuncOpts{
+			LastName: "Patel",
+			Age:      50,
+		})
+		MyFunc(MyFuncOpts{
+			FirstName: "Joe",
+			LastName:  "Smith",
+		})
+		fmt.Println(addTo(3))
+		fmt.Println(addTo(3, 2))
+		fmt.Println(addTo(3, 2, 4, 6, 8))
+		a := []int{4, 3}
+		fmt.Println(addTo(3, a...))
+		fmt.Println(addTo(3, []int{1, 2, 3, 4, 5}...))
 
-	result, _, err := divAndRemainder(5, 2)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		result, _, err := divAndRemainder(5, 2)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(result)
+		callDivAndRemainder(5, 2)
+		callDivAndRemainder(10, 0)*/
+
+	expressions := [][]string{
+		[]string{"2", "+", "3"},
+		[]string{"2", "-", "3"},
+		[]string{"2", "*", "3"},
+		[]string{"2", "/", "3"},
+		[]string{"2", "%", "3"},
+		[]string{"two", "+", "three"},
+		[]string{"2", "+", "three"},
+		[]string{"5"},
 	}
-	fmt.Println(result)
-	callDivAndRemainder(5, 2)
-	callDivAndRemainder(10, 0)
+
+	for _, expression := range expressions {
+		if len(expression) != 3 {
+			fmt.Print(expression, " -- 不正な式です\n")
+			continue
+		}
+		p1, err := strconv.Atoi(expression[0])
+		if err != nil {
+			fmt.Println(expression, " -- ", err, "\n")
+			continue
+		}
+		op := expression[1]
+		opFunc, ok := opMap[op]
+		if !ok {
+			fmt.Print(expression, " -- ", "定義されていない演算子です: ", op, "\n")
+			continue
+		}
+		p2, err := strconv.Atoi(expression[2])
+		if err != nil {
+			fmt.Print(expression, " -- ", err, "\n")
+			continue
+		}
+		result := opFunc(p1, p2)
+		fmt.Print(expression, " → ", result, "\n")
+	}
 }
