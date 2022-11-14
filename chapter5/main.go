@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 )
 
 func div(numerator int, denominator int) int {
@@ -97,41 +96,49 @@ func main() {
 		}
 		fmt.Println(result)
 		callDivAndRemainder(5, 2)
-		callDivAndRemainder(10, 0)*/
+		callDivAndRemainder(10, 0)
 
-	expressions := [][]string{
-		[]string{"2", "+", "3"},
-		[]string{"2", "-", "3"},
-		[]string{"2", "*", "3"},
-		[]string{"2", "/", "3"},
-		[]string{"2", "%", "3"},
-		[]string{"two", "+", "three"},
-		[]string{"2", "+", "three"},
-		[]string{"5"},
-	}
+		expressions := [][]string{
+			[]string{"2", "+", "3"},
+			[]string{"2", "-", "3"},
+			[]string{"2", "*", "3"},
+			[]string{"2", "/", "3"},
+			[]string{"2", "%", "3"},
+			[]string{"two", "+", "three"},
+			[]string{"2", "+", "three"},
+			[]string{"5"},
+		}
 
-	for _, expression := range expressions {
-		if len(expression) != 3 {
-			fmt.Print(expression, " -- 不正な式です\n")
-			continue
+		for _, expression := range expressions {
+			if len(expression) != 3 {
+				fmt.Print(expression, " -- 不正な式です\n")
+				continue
+			}
+			p1, err := strconv.Atoi(expression[0])
+			if err != nil {
+				fmt.Println(expression, " -- ", err, "\n")
+				continue
+			}
+			op := expression[1]
+			opFunc, ok := opMap[op]
+			if !ok {
+				fmt.Print(expression, " -- ", "定義されていない演算子です: ", op, "\n")
+				continue
+			}
+			p2, err := strconv.Atoi(expression[2])
+			if err != nil {
+				fmt.Print(expression, " -- ", err, "\n")
+				continue
+			}
+			result := opFunc(p1, p2)
+			fmt.Print(expression, " → ", result, "\n")
 		}
-		p1, err := strconv.Atoi(expression[0])
-		if err != nil {
-			fmt.Println(expression, " -- ", err, "\n")
-			continue
-		}
-		op := expression[1]
-		opFunc, ok := opMap[op]
-		if !ok {
-			fmt.Print(expression, " -- ", "定義されていない演算子です: ", op, "\n")
-			continue
-		}
-		p2, err := strconv.Atoi(expression[2])
-		if err != nil {
-			fmt.Print(expression, " -- ", err, "\n")
-			continue
-		}
-		result := opFunc(p1, p2)
-		fmt.Print(expression, " → ", result, "\n")
+	*/
+	/* 無名関数
+	for i := 0; i < 5; i++ {
+		func(j int) {
+			fmt.Println("無名関数の中で", j, "を出力")
+		}(i)
 	}
+	*/
 }
