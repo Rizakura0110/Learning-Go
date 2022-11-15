@@ -1,10 +1,6 @@
 package main
 
-import (
-	"io"
-	"log"
-	"os"
-)
+import "fmt"
 
 /*
 func div(numerator int, denominator int) int {
@@ -75,7 +71,7 @@ func makeMult(base int) func(int) int {
 		return base * factor
 	}
 }
-*/
+
 func getFile(name string) (*os.File, func(), error) {
 	file, err := os.Open(name)
 	if err != nil {
@@ -85,6 +81,30 @@ func getFile(name string) (*os.File, func(), error) {
 		file.Close()
 	}, err
 }
+*/
+type person struct {
+	age  int
+	name string
+}
+
+func modifyFails(i int, s string, p person) {
+	i *= 2
+	s = "さようなら"
+	p.name = "Bob"
+}
+
+func modMap(m map[int]string) {
+	m[2] = "こんにちは"
+	m[3] = "さようなら"
+	delete(m, 1)
+}
+func modSlice(s []int) {
+	for k, v := range s {
+		s[k] = v * 2
+	}
+	s = append(s, 10)
+}
+
 func main() {
 	/*
 		result := div(5, 2)
@@ -159,58 +179,73 @@ func main() {
 	*/
 	// クロージャ
 	/*
-		type Person struct {
-			FirstName string
-			LastName  string
-			Age       int
-		}
-		people := []Person{
-			{"Pat", "Patterson", 37},
-			{"Tracy", "Bobbert", 23},
-			{"Fred", "Fredson", 18},
-		}
-		fmt.Println("●初期データ")
-		fmt.Println(people)
-		sort.Slice(people, func(i int, j int) bool {
-			return people[i].LastName < people[j].LastName
-		})
-		fmt.Println("●姓（LastName。2番目のフィールド）でソート")
-		fmt.Println(people)
-		sort.Slice(people, func(i int, j int) bool {
-			return people[i].Age < people[j].Age
-		})
-		fmt.Println("●年齢（Age）でソート")
-		fmt.Println(people)
-
-		fmt.Println("●ソート後のpeople") //liststart4
-		fmt.Println(people)
-	*/
-	// 5-3-2
-	/*
-		twoBase := makeMult(2)
-		threeBase := makeMult(3)
-		for i := 0; i <= 5; i++ {
-			fmt.Print(i, ": ", twoBase(i), ", ", threeBase(i), "\n")
-		}
-	*/
-	if len(os.Args) < 2 {
-		log.Fatal("ファイルが指定されていません")
-	}
-	f, closer, err := getFile(os.Args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer closer()
-	data := make([]byte, 2048)
-	for {
-		count, err := f.Read(data)
-		os.Stdout.Write(data[:count])
-		if err != nil {
-			if err != io.EOF {
-				log.Fatal(err)
+			type Person struct {
+				FirstName string
+				LastName  string
+				Age       int
 			}
-			break
-		}
-	}
+			people := []Person{
+				{"Pat", "Patterson", 37},
+				{"Tracy", "Bobbert", 23},
+				{"Fred", "Fredson", 18},
+			}
+			fmt.Println("●初期データ")
+			fmt.Println(people)
+			sort.Slice(people, func(i int, j int) bool {
+				return people[i].LastName < people[j].LastName
+			})
+			fmt.Println("●姓（LastName。2番目のフィールド）でソート")
+			fmt.Println(people)
+			sort.Slice(people, func(i int, j int) bool {
+				return people[i].Age < people[j].Age
+			})
+			fmt.Println("●年齢（Age）でソート")
+			fmt.Println(people)
 
+			fmt.Println("●ソート後のpeople") //liststart4
+			fmt.Println(people)
+
+			twoBase := makeMult(2)
+			threeBase := makeMult(3)
+			for i := 0; i <= 5; i++ {
+				fmt.Print(i, ": ", twoBase(i), ", ", threeBase(i), "\n")
+			}
+
+		if len(os.Args) < 2 {
+			log.Fatal("ファイルが指定されていません")
+		}
+		f, closer, err := getFile(os.Args[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer closer()
+		data := make([]byte, 2048)
+		for {
+			count, err := f.Read(data)
+			os.Stdout.Write(data[:count])
+			if err != nil {
+				if err != io.EOF {
+					log.Fatal(err)
+				}
+				break
+			}
+		}
+	*/
+	p := person{}
+	i := 2
+	t := "こんにちは"
+	fmt.Println(i, t, p)
+	modifyFails(i, t, p)
+	fmt.Println(i, t, p)
+
+	m := map[int]string{
+		1: "1番目",
+		2: "2番目",
+	}
+	modMap(m)
+	fmt.Println(m)
+
+	s := []int{1, 2, 3}
+	modSlice(s)
+	fmt.Println(s)
 }
