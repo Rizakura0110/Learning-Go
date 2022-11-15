@@ -76,6 +76,15 @@ func makeMult(base int) func(int) int {
 	}
 }
 */
+func getFile(name string) (*os.File, func(), error) {
+	file, err := os.Open(name)
+	if err != nil {
+		return nil, nil, err
+	}
+	return file, func() {
+		file.Close()
+	}, err
+}
 func main() {
 	/*
 		result := div(5, 2)
@@ -187,12 +196,11 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("ファイルが指定されていません")
 	}
-	f, err := os.Open(os.Args[1])
+	f, closer, err := getFile(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
-
+	defer closer()
 	data := make([]byte, 2048)
 	for {
 		count, err := f.Read(data)
@@ -204,4 +212,5 @@ func main() {
 			break
 		}
 	}
+
 }
