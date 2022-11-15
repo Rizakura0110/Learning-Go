@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"io"
+	"log"
+	"os"
+)
 
 /*
 func div(numerator int, denominator int) int {
@@ -65,14 +69,13 @@ var opMap = map[string]func(int, int) int{
 	"*": mul,
 	"/": div2,
 }
-*/
 
 func makeMult(base int) func(int) int {
 	return func(factor int) int {
 		return base * factor
 	}
 }
-
+*/
 func main() {
 	/*
 		result := div(5, 2)
@@ -174,9 +177,31 @@ func main() {
 		fmt.Println(people)
 	*/
 	// 5-3-2
-	twoBase := makeMult(2)
-	threeBase := makeMult(3)
-	for i := 0; i <= 5; i++ {
-		fmt.Print(i, ": ", twoBase(i), ", ", threeBase(i), "\n")
+	/*
+		twoBase := makeMult(2)
+		threeBase := makeMult(3)
+		for i := 0; i <= 5; i++ {
+			fmt.Print(i, ": ", twoBase(i), ", ", threeBase(i), "\n")
+		}
+	*/
+	if len(os.Args) < 2 {
+		log.Fatal("ファイルが指定されていません")
+	}
+	f, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	data := make([]byte, 2048)
+	for {
+		count, err := f.Read(data)
+		os.Stdout.Write(data[:count])
+		if err != nil {
+			if err != io.EOF {
+				log.Fatal(err)
+			}
+			break
+		}
 	}
 }
