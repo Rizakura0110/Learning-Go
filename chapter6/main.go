@@ -22,11 +22,20 @@ func main() {
 		MiddleName *string
 		LastName   string
 	}
-
+	/*
+		p := person{
+			FirstName:  "pat",
+			MiddleName: "perry", // error
+			LastName:   "peterson",
+		}
+		fmt.Println(p)
+	*/
+	s := "perry"
 	p := person{
-		FirstName:  "pat",
-		MiddleName: "perry",
-		LastName:   "peterson",
+		FirstName:  "Pat",
+		MiddleName: &s,
+		LastName:   "Peterson",
 	}
 	fmt.Println(p)
+	fmt.Println(*p.MiddleName)
 }
