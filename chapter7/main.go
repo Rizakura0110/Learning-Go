@@ -29,6 +29,16 @@ func (c Counter) String() string {
 	return fmt.Sprintf("合計: %d, 更新: %v", c.total, c.lastUpdated)
 }
 
+func doUpdateWrong(c Counter) {
+	c.increment()
+	fmt.Println("NG:", c.String())
+}
+
+func doUpdateRight(c *Counter) {
+	c.increment()
+	fmt.Println("OK:", c.String())
+}
+
 func main() {
 	p := Person{
 		LastName:  "武田",
@@ -39,7 +49,8 @@ func main() {
 	fmt.Println(output)
 
 	var c Counter
-	fmt.Println(c.String())
-	c.increment()
-	fmt.Println(c.String())
+	doUpdateWrong(c)
+	fmt.Println("main:", c.String())
+	doUpdateRight(&c)
+	fmt.Println("main:", c.String())
 }
