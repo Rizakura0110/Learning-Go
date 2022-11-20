@@ -87,10 +87,38 @@ type Person struct {
 	Age       int
 }
 
-type Employee Person
+// type Employee Person
 
 func (s Score) Double() Score {
 	return s * 2
+}
+
+type Employee struct {
+	Name string
+	ID   string
+}
+
+func (e Employee) Description() string {
+	return fmt.Sprintf("%s (%s)", e.Name, e.ID)
+}
+
+type Manager struct {
+	Employee
+	Reports []Employee
+}
+
+func (m Manager) FindNewEmplyees() []Employee {
+	newEmployees := []Employee{
+		Employee{
+			"石田三成",
+			"13112",
+		},
+		Employee{
+			"徳川家康",
+			"13115",
+		},
+	}
+	return newEmployees
 }
 
 func main() {
@@ -192,5 +220,22 @@ func main() {
 		fmt.Println("Value2:", Value2)
 		fmt.Println("Value3:", Value3)
 		fmt.Println("Value4:", Value4)
+	}
+
+	{
+		m := Manager{
+			Employee: Employee{
+				Name: "豊臣秀吉",
+				ID:   "12345",
+			},
+			Reports: []Employee{},
+		}
+		fmt.Println(m.ID)
+		fmt.Println(m.Description())
+		fmt.Println(m.Employee)
+
+		m.Reports = m.FindNewEmplyees()
+		fmt.Println(m.Employee)
+		fmt.Println(m.Reports)
 	}
 }
