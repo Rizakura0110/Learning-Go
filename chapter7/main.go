@@ -141,4 +141,56 @@ func main() {
 	hs = 300
 	fmt.Println(s.Double())
 	fmt.Println(Score(hs).Double())
+
+	{
+		type MailCategory int
+
+		const (
+			Uncategorized MailCategory = iota
+			Personal
+			Spamc
+			Social
+			Advertisements
+		)
+
+		m := Personal
+		fmt.Println("Personal:", m)
+		m = Advertisements
+		fmt.Println(m)
+	}
+
+	{
+		type SomeValue int
+
+		const (
+			_ SomeValue = iota
+			// or Value0 = iota
+			Value1
+			Value2
+			Value3
+			Value4
+		)
+		//fmt.Println("Value0:", Value0)
+		fmt.Println("Value1:", Value1)
+		fmt.Println("Value2:", Value2)
+		fmt.Println("Value3:", Value3)
+		fmt.Println("Value4:", Value4)
+	}
+	{
+		type SomeValue int
+
+		const (
+			Invalid SomeValue = iota
+			Value1
+			Value2
+			Value3
+			Value4
+		)
+
+		fmt.Println("Invalid:", Invalid)
+		fmt.Println("Value1:", Value1)
+		fmt.Println("Value2:", Value2)
+		fmt.Println("Value3:", Value3)
+		fmt.Println("Value4:", Value4)
+	}
 }
