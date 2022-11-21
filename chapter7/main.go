@@ -121,6 +121,15 @@ func (m Manager) FindNewEmplyees() []Employee {
 	return newEmployees
 }
 
+type Inner struct {
+	X int
+}
+
+type Outer struct {
+	Inner
+	X int
+}
+
 func main() {
 	/*
 		p := Person{
@@ -237,5 +246,16 @@ func main() {
 		m.Reports = m.FindNewEmplyees()
 		fmt.Println(m.Employee)
 		fmt.Println(m.Reports)
+	}
+
+	{
+		o := Outer{
+			Inner: Inner{
+				X: 10,
+			},
+			X: 20,
+		}
+		fmt.Println(o.X)
+		fmt.Println(o.Inner.X)
 	}
 }
