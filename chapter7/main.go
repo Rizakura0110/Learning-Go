@@ -122,12 +122,25 @@ func (m Manager) FindNewEmplyees() []Employee {
 }
 
 type Inner struct {
-	X int
+	A int
+}
+
+func (i Inner) IntPrinter(val int) string {
+	return fmt.Sprintf("Inner: %d", val)
+}
+
+func (i Inner) Double() string {
+	result := i.A * 2
+	return i.IntPrinter(result)
 }
 
 type Outer struct {
 	Inner
-	X int
+	S string
+}
+
+func (o Outer) IntPrinter(val int) string {
+	return fmt.Sprintf("Outer: %d", val)
 }
 
 func main() {
@@ -251,11 +264,32 @@ func main() {
 	{
 		o := Outer{
 			Inner: Inner{
-				X: 10,
+				A: 10,
 			},
-			X: 20,
+			S: "Hello",
 		}
-		fmt.Println(o.X)
-		fmt.Println(o.Inner.X)
+		fmt.Println(o.Double())
+	}
+
+	{
+		var s *string
+		fmt.Println(s == nil)
+		var i interface{}
+		fmt.Println(i == nil)
+		i = s
+		fmt.Println(i == nil)
+	}
+
+	{
+		var i any // var i interface{}と同じ
+		i = 20
+		fmt.Println(i)
+		i = "Hello"
+		fmt.Println(i)
+		i = struct {
+			FirstName string
+			LastName  string
+		}{"震源", "武田"}
+		fmt.Println(i)
 	}
 }
