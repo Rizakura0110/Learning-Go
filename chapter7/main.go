@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -142,6 +143,8 @@ type Outer struct {
 func (o Outer) IntPrinter(val int) string {
 	return fmt.Sprintf("Outer: %d", val)
 }
+
+type MyInt int
 
 func main() {
 	/*
@@ -291,5 +294,88 @@ func main() {
 			LastName  string
 		}{"震源", "武田"}
 		fmt.Println(i)
+	}
+
+	{
+		var i any
+		var mine MyInt = 20
+		i = mine
+		i2 := i.(MyInt)
+		fmt.Println(i2)
+
+		//i3 := i.(string)
+		//fmt.Println(i3)
+
+		//i4 := i.(int)
+		//fmt.Println(i4)
+	}
+
+	{
+		/*
+			var i any
+			var mine MyInt = 20
+			i = mine
+			i4, ok := i.(int)
+			if !ok {
+				err := fmt.Errorf("iの型（値:%v）が想定外です", i)
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
+			fmt.Println(i4)
+		*/
+	}
+
+	{
+		var i any
+		doTypeSwitch(i)
+
+		var mine MyInt = 20
+		i = mine
+		doTypeSwitch(i)
+
+		s := "これは文字列"
+		doTypeSwitch(s)
+
+		s2 := []rune(s)
+		doTypeSwitch(s2)
+
+		doTypeSwitch(s2[0])
+
+		b := int(mine) < 20
+		fmt.Println(b)
+
+		b = int(mine) == 20
+		doTypeSwitch(b)
+
+		type Person struct {
+			FirstName string
+			LastName  string
+			Age       int
+		}
+		st := Person{
+			FirstName: "John",
+			LastName:  "Backer",
+			Age:       20,
+		}
+		doTypeSwitch(st)
+	}
+}
+
+func doTypeSwitch(i any) {
+	switch j := i.(type) {
+	case nil:
+		fmt.Printf("case nil; i:%v（型:%T）, j:%v（型:%T）\n", i, i, j, j)
+	case int:
+		fmt.Printf("case int; i:%d（型:%T）, j:%v（型:%T）\n", i, i, j, j)
+	case MyInt:
+		fmt.Printf("case MyInt; i:%d（型:%T）, j:%v（型:%T）\n", i, i, j, j)
+	case io.Reader:
+		fmt.Printf("case io.Reader; i:%v（型:%T）, j:%v（型:%T）\n", i, i, j, j)
+	case string:
+		fmt.Printf("case string; i:%s（型:%T）, j:%v（型:%T）\n", i, i, j, j)
+	case bool, rune:
+		fmt.Printf("case bool, rune; i:%v（型:%T）, j:%v（型:%T）\n", i, i, j, j)
+	default:
+		fmt.Printf("default; i:%v（型:%T）, j:%v（型:%T）\n", i, i, j, j)
 	}
 }
