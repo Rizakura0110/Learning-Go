@@ -168,6 +168,15 @@ func main() {
 			http.ListenAndServe(":8080", nil)
 		*/
 	}
+	{
+		result, err := timeLimit()
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("結果: %d\n", result)
+		}
+	}
 }
 
 func countTo(max int) <-chan int {
@@ -313,4 +322,29 @@ func (pg *PressureGauge) Process2(f func()) error {
 func doThingThatShouldBeLimited() string {
 	time.Sleep(2 * time.Second)
 	return "done"
+}
+
+func timeLimit() (int, error) {
+	var result int
+	var err error
+	done := make(chan struct{})
+	go func() {
+		result, err = doSomeWork()
+		close(done)
+	}()
+	select {
+	case <-done:
+		return result, err
+	case <-time.After(2 * time.Second):
+		return 0, errors.New("タイムアウトしました")
+	}
+}
+
+func doSomeWork() (int, error) {
+	rand.Seed(time.Now().UnixNano())
+	n := rand.Intn(4)
+	fmt.Println("n:", n)
+	time.Sleep(time.Duration(n) * time.Second)
+	result := 33
+	return result, nil
 }
