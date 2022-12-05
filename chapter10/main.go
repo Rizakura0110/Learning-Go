@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -177,6 +178,38 @@ func main() {
 			fmt.Println("結果: %d\n", result)
 		}
 	}
+
+	{
+		var wg sync.WaitGroup
+		wg.Add(3)
+
+		go func() {
+			defer wg.Done()
+			doThing1()
+		}()
+
+		go func() {
+			defer wg.Done()
+			doThing2()
+		}()
+
+		go func() {
+			defer wg.Done()
+			doThing3()
+		}()
+
+		wg.Wait()
+	}
+
+	{
+		inpValues := []int{1, 2, 3, 4, 5}
+		outValues := processAndGather(
+			func(j int) int {
+				return j * j
+			},
+			inpValues)
+		fmt.Println(outValues)
+	}
 }
 
 func countTo(max int) <-chan int {
@@ -347,4 +380,38 @@ func doSomeWork() (int, error) {
 	time.Sleep(time.Duration(n) * time.Second)
 	result := 33
 	return result, nil
+}
+
+func doThing1() {
+	fmt.Println("Thing 1 done!")
+}
+
+func doThing2() {
+	fmt.Println("Thing 2 done!")
+}
+
+func doThing3() {
+	fmt.Println("Thing 3 done!")
+}
+
+func processAndGather(processor func(int) int, data []int) []int {
+	num := len(data)
+	chResult := make(chan int, num)
+	var wg sync.WaitGroup
+	wg.Add(num)
+
+	for _, v := range data {
+		go func(v int) {
+			defer wg.Done()
+			chResult <- processor(v)
+		}(v)
+	}
+	wg.Wait()
+	close(chResult)
+
+	var result []int
+	for v := range chResult {
+		result = append(result, v)
+	}
+	return result
 }
