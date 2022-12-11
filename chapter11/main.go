@@ -2,10 +2,13 @@ package main
 
 import (
 	"compress/gzip"
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -17,6 +20,41 @@ func main() {
 
 	{
 		countLettersInGzipFile()
+	}
+
+	{
+		d := 2 * time.Hour
+		// 2h0m0s
+		fmt.Println(d)
+		d = 2*time.Hour + 30*time.Minute + 45*time.Second
+		// 2 h30m45s
+		fmt.Println(d)
+	}
+
+	{
+		_ = timeTest()
+	}
+
+	{
+		f := struct {
+			Name string
+			Age  int
+		}{}
+		err := json.Unmarshal([]byte(`{"name": "小野小町", "occupation": "歌人", "age": 20}`), &f)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Printf("%+v", f)
+	}
+	{
+		data := readData()
+		var o Order
+		err := json.Unmarshal(data, &o)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%+v\n", o)
 	}
 }
 
@@ -105,4 +143,40 @@ func countLettersInGzipFile() error {
 	}
 	fmt.Println(counts)
 	return nil
+}
+
+func timeTest() error {
+	//t, err := time.Parse("2006-02-01 15:04:05 -0700", "2022-23-09 12:34:56 +0900")
+	t, err := time.Parse("2006年1月2日 PM3:04:05 -0700", "2022年07月15日 PM6:34:56 +0900")
+	if err != nil {
+		return err
+	}
+	fmt.Println(t.Format("January 2, 2006 at 3:04:05PM MST"))
+	fmt.Println(t.Format("2006年1月2日 15時4分5秒"))
+	fmt.Println(t.Format("2006.01.02 15:04:05"))
+	fmt.Println(t.Format("1/2/2006 15:04:05 MST"))
+	t2, _ := time.Parse("2006.01.02 3:04:05PM -0700", "2022.01.05 04:34:12AM +0900")
+	t3, _ := time.Parse("2006.01.02 3:04:05PM -0700", "2022.01.05 05:35:14AM +0900")
+	fmt.Println(t3.Sub(t2))
+	fmt.Println(t3.Add(time.Minute*30 + time.Second*5))
+	return nil
+}
+
+type Order struct {
+	ID          string
+	DataOrdered time.Time
+	CuntomerID  string
+	Items       []Item
+}
+type Item struct {
+	ID   string
+	Name string
+}
+
+func readData() []byte {
+	b, err := os.ReadFile("testdata/data.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return b
 }
