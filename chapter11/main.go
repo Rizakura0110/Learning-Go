@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
@@ -56,6 +57,131 @@ func main() {
 		}
 		fmt.Printf("%+v\n", o)
 	}
+
+	{
+		type Person struct {
+			Name string
+			Age  int
+		}
+		dataToFile := Person{
+			Name: "フレッド",
+			Age:  40,
+		}
+		tmpFile, err := os.CreateTemp(os.TempDir(), "sample-")
+		if err != nil {
+			panic(err)
+		}
+		defer os.Remove(tmpFile.Name())
+		err = json.NewEncoder(tmpFile).Encode(dataToFile)
+		if err != nil {
+			panic(err)
+		}
+		err = tmpFile.Close()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("ファイルに書き込んだデータ: %+v\n", dataToFile)
+
+		tmpFile2, err := os.Open(tmpFile.Name())
+		if err != nil {
+			panic(err)
+		}
+		var dataFromFile Person
+		err = json.NewDecoder(tmpFile2).Decode(&dataFromFile)
+		if err != nil {
+			panic(err)
+		}
+		err = tmpFile2.Close()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("ファイルから読み込んだデータ: %+v\n", dataFromFile)
+	}
+	{
+		const data = `
+			{"name": "フレッド", "age": 40}
+			{"name": "メアリ", "age": 21}
+			{"name": "パッド", "age": 30}
+		`
+		var t struct {
+			Name string
+			Age  int
+		}
+		dec := json.NewDecoder(strings.NewReader(data))
+		var b bytes.Buffer
+		enc := json.NewEncoder(&b)
+
+		for dec.More() {
+			err := dec.Decode(&t)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(t)
+			err = enc.Encode(t)
+			if err != nil {
+				panic(err)
+			}
+		}
+		fmt.Println("------")
+		out := b.String()
+		fmt.Println(out)
+	}
+	{
+		r, err := os.Open("testdata/data2.json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		var dec *json.Decoder
+		dec = json.NewDecoder(r)
+
+		var b bytes.Buffer
+		encorder := json.NewEncoder(&b)
+		for dec.More() {
+			var o Order
+			err := dec.Decode(&o)
+			if err != nil {
+				log.Fatal(err)
+			}
+			err = encorder.Encode(o)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		out := b.String()
+		fmt.Printf("out:\n%v\n", out)
+	}
+	/*
+		{
+			data := `
+			{
+				"id": "12345",
+				"items": [
+					{
+						"id": "xyz123",
+						"name": "Thing 1"
+					},
+					{
+						"id": "abc789",
+						"name": "Thing 2"
+					}
+				],
+				"date_ordered": "01 May 20 13:01 +0000",
+				"customer_id": "3"
+			}`
+			var o Order
+			err := json.Unmarshal([]byte(data), &o)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Printf("%+v\n", o)
+			fmt.Println(o.DateOrdered.Month())
+			out, err := json.Marshal(o)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println(string(out))
+		}
+	*/
 }
 
 func countLetters(r io.Reader) (map[string]int, error) {
@@ -162,6 +288,7 @@ func timeTest() error {
 	return nil
 }
 
+/*
 type Order struct {
 	ID          string
 	DataOrdered time.Time
@@ -172,7 +299,40 @@ type Item struct {
 	ID   string
 	Name string
 }
+*/
 
+type Item struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type Order struct {
+	ID          string      `json:"id"`
+	Items       []Item      `json:"items"`
+	DateOrdered RFC822ZTime `json:"date_ordered"`
+	CustomerID  string      `json:"customer_id"`
+}
+
+type RFC822ZTime struct {
+	time.Time
+}
+
+func (rt RFC822ZTime) MarshalJSON() ([]byte, error) {
+	out := rt.Time.Format(time.RFC822Z)
+	return []byte(`"` + out + `"`), nil
+}
+
+func (rt *RFC822ZTime) UnmarshalJSON(b []byte) error {
+	if string(b) == "null" {
+		return nil
+	}
+	t, err := time.Parse(`"`+time.RFC822Z+`"`, string(b))
+	if err != nil {
+		return err
+	}
+	*rt = RFC822ZTime{t}
+	return nil
+}
 func readData() []byte {
 	b, err := os.ReadFile("testdata/data.json")
 	if err != nil {
