@@ -1,12 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -35,153 +36,161 @@ func main() {
 	{
 		_ = timeTest()
 	}
-
-	{
-		f := struct {
-			Name string
-			Age  int
-		}{}
-		err := json.Unmarshal([]byte(`{"name": "小野小町", "occupation": "歌人", "age": 20}`), &f)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Printf("%+v", f)
-	}
-	{
-		data := readData()
-		var o Order
-		err := json.Unmarshal(data, &o)
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Printf("%+v\n", o)
-	}
-
-	{
-		type Person struct {
-			Name string
-			Age  int
-		}
-		dataToFile := Person{
-			Name: "フレッド",
-			Age:  40,
-		}
-		tmpFile, err := os.CreateTemp(os.TempDir(), "sample-")
-		if err != nil {
-			panic(err)
-		}
-		defer os.Remove(tmpFile.Name())
-		err = json.NewEncoder(tmpFile).Encode(dataToFile)
-		if err != nil {
-			panic(err)
-		}
-		err = tmpFile.Close()
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("ファイルに書き込んだデータ: %+v\n", dataToFile)
-
-		tmpFile2, err := os.Open(tmpFile.Name())
-		if err != nil {
-			panic(err)
-		}
-		var dataFromFile Person
-		err = json.NewDecoder(tmpFile2).Decode(&dataFromFile)
-		if err != nil {
-			panic(err)
-		}
-		err = tmpFile2.Close()
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("ファイルから読み込んだデータ: %+v\n", dataFromFile)
-	}
-	{
-		const data = `
-			{"name": "フレッド", "age": 40}
-			{"name": "メアリ", "age": 21}
-			{"name": "パッド", "age": 30}
-		`
-		var t struct {
-			Name string
-			Age  int
-		}
-		dec := json.NewDecoder(strings.NewReader(data))
-		var b bytes.Buffer
-		enc := json.NewEncoder(&b)
-
-		for dec.More() {
-			err := dec.Decode(&t)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Println(t)
-			err = enc.Encode(t)
-			if err != nil {
-				panic(err)
-			}
-		}
-		fmt.Println("------")
-		out := b.String()
-		fmt.Println(out)
-	}
-	{
-		r, err := os.Open("testdata/data2.json")
-		if err != nil {
-			log.Fatal(err)
-		}
-		var dec *json.Decoder
-		dec = json.NewDecoder(r)
-
-		var b bytes.Buffer
-		encorder := json.NewEncoder(&b)
-		for dec.More() {
-			var o Order
-			err := dec.Decode(&o)
-			if err != nil {
-				log.Fatal(err)
-			}
-			err = encorder.Encode(o)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-		out := b.String()
-		fmt.Printf("out:\n%v\n", out)
-	}
 	/*
 		{
-			data := `
-			{
-				"id": "12345",
-				"items": [
-					{
-						"id": "xyz123",
-						"name": "Thing 1"
-					},
-					{
-						"id": "abc789",
-						"name": "Thing 2"
-					}
-				],
-				"date_ordered": "01 May 20 13:01 +0000",
-				"customer_id": "3"
-			}`
-			var o Order
-			err := json.Unmarshal([]byte(data), &o)
+			f := struct {
+				Name string
+				Age  int
+			}{}
+			err := json.Unmarshal([]byte(`{"name": "小野小町", "occupation": "歌人", "age": 20}`), &f)
 			if err != nil {
-				panic(err)
+				fmt.Println(err)
+				return
+			}
+			fmt.Printf("%+v", f)
+		}
+		{
+			data := readData()
+			var o Order
+			err := json.Unmarshal(data, &o)
+			if err != nil {
+				log.Fatal(err)
 			}
 			fmt.Printf("%+v\n", o)
-			fmt.Println(o.DateOrdered.Month())
-			out, err := json.Marshal(o)
+		}
+
+		{
+			type Person struct {
+				Name string
+				Age  int
+			}
+			dataToFile := Person{
+				Name: "フレッド",
+				Age:  40,
+			}
+			tmpFile, err := os.CreateTemp(os.TempDir(), "sample-")
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println(string(out))
+			defer os.Remove(tmpFile.Name())
+			err = json.NewEncoder(tmpFile).Encode(dataToFile)
+			if err != nil {
+				panic(err)
+			}
+			err = tmpFile.Close()
+			if err != nil {
+				panic(err)
+			}
+			fmt.Printf("ファイルに書き込んだデータ: %+v\n", dataToFile)
+
+			tmpFile2, err := os.Open(tmpFile.Name())
+			if err != nil {
+				panic(err)
+			}
+			var dataFromFile Person
+			err = json.NewDecoder(tmpFile2).Decode(&dataFromFile)
+			if err != nil {
+				panic(err)
+			}
+			err = tmpFile2.Close()
+			if err != nil {
+				panic(err)
+			}
+			fmt.Printf("ファイルから読み込んだデータ: %+v\n", dataFromFile)
 		}
+		{
+			r, err := os.Open("testdata/data2.json")
+			if err != nil {
+				log.Fatal(err)
+			}
+			var dec *json.Decoder
+			dec = json.NewDecoder(r)
+
+			var b bytes.Buffer
+			encorder := json.NewEncoder(&b)
+			for dec.More() {
+				var o Order
+				err := dec.Decode(&o)
+				if err != nil {
+					log.Fatal(err)
+				}
+				err = encorder.Encode(o)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+			out := b.String()
+			fmt.Printf("out:\n%v\n", out)
+		}
+			{
+				data := `
+				{
+					"id": "12345",
+					"items": [
+						{
+							"id": "xyz123",
+							"name": "Thing 1"
+						},
+						{
+							"id": "abc789",
+							"name": "Thing 2"
+						}
+					],
+					"date_ordered": "01 May 20 13:01 +0000",
+					"customer_id": "3"
+				}`
+				var o Order
+				err := json.Unmarshal([]byte(data), &o)
+				if err != nil {
+					panic(err)
+				}
+				fmt.Printf("%+v\n", o)
+				fmt.Println(o.DateOrdered.Month())
+				out, err := json.Marshal(o)
+				if err != nil {
+					panic(err)
+				}
+				fmt.Println(string(out))
+			}
 	*/
+	{
+		client := http.Client{
+			Timeout: 30 * time.Second,
+		}
+
+		url := "https://jsonplaceholder.typicode.com/todos/1"
+		req, err := http.NewRequestWithContext(
+			context.Background(),
+			http.MethodGet,
+			url,
+			nil,
+		)
+		if err != nil {
+			panic(err)
+		}
+		req.Header.Add("X-My-Client", "Learning Go")
+		res, err := client.Do(req)
+		if err != nil {
+			panic(err)
+		}
+
+		defer res.Body.Close()
+		if res.StatusCode != http.StatusOK {
+			panic(fmt.Sprintf("unexpected status: got %v", res.Status))
+		}
+		fmt.Println(res.Header.Get("Content-Type"))
+		var data struct {
+			UserID    int    `json:"userId"`
+			ID        int    `json:"id"`
+			Title     string `json:"title"`
+			Completed bool   `json:"completed"`
+		}
+		err = json.NewDecoder(res.Body).Decode(&data)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("%+v\n", data)
+	}
 }
 
 func countLetters(r io.Reader) (map[string]int, error) {
