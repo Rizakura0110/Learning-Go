@@ -191,6 +191,43 @@ func main() {
 		}
 		fmt.Printf("%+v\n", data)
 	}
+	/*
+		{
+			s := http.Server{
+				Addr:         ":8080",
+				ReadTimeout:  30 * time.Second,
+				WriteTimeout: 90 * time.Second,
+				IdleTimeout:  120 * time.Second,
+				Handler:      HelloHandler{},
+			}
+			fmt.Println("ブラウザで http://localhost:8080/ を開いてください。")
+			err := s.ListenAndServe()
+			if err != nil {
+				if err != http.ErrServerClosed {
+					panic(err)
+				}
+			}
+		}
+	*/
+	{
+		personMux := http.NewServeMux()
+		personMux.HandleFunc("/greet",
+			func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("こんにちは！\n"))
+			},
+		)
+		dogMux := http.NewServeMux()
+		dogMux.HandleFunc("/greet",
+			func(w http.ResponseWriter, r *http.Request) {
+				w.Write([]byte("カワイイ子犬ちゃんだね！\n"))
+			},
+		)
+		mux := http.NewServeMux()
+		mux.Handle("/person/", http.StripPrefix("/person", personMux))
+		mux.Handle("/dog/", http.StripPrefix("/dog", dogMux))
+		fmt.Printf("%s", "次でテスト:\ncurl http://localhost:8080/dog/greet\ncurl http://localhost:8080/person/greet\n")
+		log.Fatal(http.ListenAndServe(":8080", mux))
+	}
 }
 
 func countLetters(r io.Reader) (map[string]int, error) {
@@ -348,4 +385,10 @@ func readData() []byte {
 		log.Fatal(err)
 	}
 	return b
+}
+
+type HelloHandler struct{}
+
+func (hh HelloHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello!\n"))
 }
