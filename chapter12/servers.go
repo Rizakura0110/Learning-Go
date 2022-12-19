@@ -15,7 +15,7 @@ func slowServer() *httptest.Server {
 	return s
 }
 
-func faseServer() *httptest.Server {
+func fastServer() *httptest.Server {
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter,
 		r *http.Request) {
 		if r.URL.Query().Get("error") == "true" {
